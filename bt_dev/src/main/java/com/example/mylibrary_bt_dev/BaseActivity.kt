@@ -1,5 +1,6 @@
 package com.example.bt_def
 
+import DeviceListFragment
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager

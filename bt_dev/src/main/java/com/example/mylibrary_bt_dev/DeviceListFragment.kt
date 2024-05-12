@@ -1,5 +1,3 @@
-package com.example.bt_def
-
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -15,6 +13,8 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bt_def.ItemAdapter
+import com.example.bt_def.changeButtonColor
 import com.example.mylibrary_bt_dev.ListItem
 import com.example.mylibrary_bt_dev.databinding.FragmentListBinding
 import com.google.android.material.snackbar.Snackbar
@@ -38,22 +38,23 @@ class DeviceListFragment : Fragment() {
         binding.imBluetoothOn.setOnClickListener {
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
+        initRcViews()
         registerBtLauncher()
         initBtAdapter()
         bluetoothState()
     }
 
-    private fun initRcViews() = with(binding) {
+    private fun initRcViews() = with(binding){
         rcViewPaired.layoutManager = LinearLayoutManager(requireContext())
         itemAdapter = ItemAdapter()
         rcViewPaired.adapter = itemAdapter
     }
 
-    private fun getPraiedDecvices() {
+    private fun getPairedDevices(){
         try {
             val list = ArrayList<ListItem>()
             val deviceList = bAdapter?.bondedDevices as Set<BluetoothDevice>
-            deviceList.forEach {
+            deviceList.forEach{
                 list.add(
                     ListItem(
                         it.name,
@@ -61,34 +62,38 @@ class DeviceListFragment : Fragment() {
                     )
                 )
             }
-            binding.tvEmptyPaired.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvEmptyPaired.visibility = if(list.isEmpty()) View.VISIBLE else View.GONE
             itemAdapter.submitList(list)
-        } catch (e: SecurityException) {
+        } catch (e: SecurityException){
 
         }
+
     }
 
-    private fun initBtAdapter() {
+    private fun initBtAdapter(){
         val bManager = activity?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bAdapter = bManager.adapter
     }
 
-    private fun bluetoothState() {
-        if (bAdapter?.isEnabled == true) {
+    private fun bluetoothState(){
+        if (bAdapter?.isEnabled == true){
             changeButtonColor(binding.imBluetoothOn, Color.GREEN)
+            getPairedDevices()
         }
     }
 
-    private fun registerBtLauncher() {
+    private fun registerBtLauncher(){
         btLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (it.resultCode == Activity.RESULT_OK) {
+        ){
+            if (it.resultCode == Activity.RESULT_OK){
                 changeButtonColor(binding.imBluetoothOn, Color.GREEN)
-                Snackbar.make(binding.root, "Блютуз включен", Snackbar.LENGTH_LONG).show()
+                getPairedDevices()
+                Snackbar.make(binding.root, "Блютуз включен!", Snackbar.LENGTH_LONG).show()
             } else {
-                Snackbar.make(binding.root, "Блютуз выключен", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Блютуз выключен!", Snackbar.LENGTH_LONG).show()
             }
         }
     }
+
 }
