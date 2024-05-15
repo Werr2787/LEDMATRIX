@@ -1,3 +1,4 @@
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -6,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,11 +17,13 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bt_def.ItemAdapter
+import com.example.bt_def.changeBtPermissions
 import com.example.bt_def.changeButtonColor
 import com.example.mylibrary_bt_dev.BluetoothConstants
 import com.example.mylibrary_bt_dev.ListItem
 import com.example.mylibrary_bt_dev.databinding.FragmentListBinding
 import com.google.android.material.snackbar.Snackbar
+
 
 class DeviceListFragment : Fragment(), ItemAdapter.Listener {
     private var preference: SharedPreferences? = null
@@ -27,7 +31,7 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
     private var bAdapter: BluetoothAdapter? = null
     private lateinit var binding: FragmentListBinding
     private lateinit var btLauncher: ActivityResultLauncher<Intent>
-
+    private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,10 +42,12 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        preference = activity?.getSharedPreferences(BluetoothConstants.PREFERENCES, Context.MODE_PRIVATE)
+        preference =
+            activity?.getSharedPreferences(BluetoothConstants.PREFERENCES, Context.MODE_PRIVATE)
         binding.imBluetoothOn.setOnClickListener {
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
+        checkPermissions()
         initRcViews()
         registerBtLauncher()
         initBtAdapter()
@@ -63,7 +69,7 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
                     ListItem(
                         it.name,
                         it.address,
-                        preference?.getString(BluetoothConstants.MAC,"")==it.address
+                        preference?.getString(BluetoothConstants.MAC, "") == it.address
                     )
                 )
             }
@@ -101,9 +107,39 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
         }
     }
 
+    private fun checkPermissions() {
+        if (!changeBtPermissions()) {
+            registerPermissionListener()
+            launchBtPermissions()
+        }
+    }
+
+    fun registerPermissionListener() {
+        pLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ){
+
+        }
+    }
+
+    private fun launchBtPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pLauncher.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            )
+        }else{
+            pLauncher.launch((arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )))
+        }
+    }
+
     private fun saveMac(mac: String) {
         val editer = preference?.edit()
-        editer?.putString(BluetoothConstants.MAC,mac)
+        editer?.putString(BluetoothConstants.MAC, mac)
         editer?.apply()
     }
 
