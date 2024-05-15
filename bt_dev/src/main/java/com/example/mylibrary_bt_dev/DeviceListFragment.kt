@@ -27,14 +27,15 @@ import com.example.mylibrary_bt_dev.ListItem
 import com.example.mylibrary_bt_dev.databinding.FragmentListBinding
 import com.google.android.material.snackbar.Snackbar
 
-
 class DeviceListFragment : Fragment(), ItemAdapter.Listener {
-    private var preference: SharedPreferences? = null
+    private var preferences: SharedPreferences? = null
     private lateinit var itemAdapter: ItemAdapter
+    private lateinit var discoveryAdapter: ItemAdapter
     private var bAdapter: BluetoothAdapter? = null
     private lateinit var binding: FragmentListBinding
     private lateinit var btLauncher: ActivityResultLauncher<Intent>
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,19 +46,15 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        preference =
+        preferences =
             activity?.getSharedPreferences(BluetoothConstants.PREFERENCES, Context.MODE_PRIVATE)
         binding.imBluetoothOn.setOnClickListener {
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
-        binding.imBluetoothOn.setOnClickListener{
-            btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
-        }
-        binding.imBluetoothSearch.setOnClickListener{
+        binding.imBluetoothSearch.setOnClickListener {
             try {
                 bAdapter?.startDiscovery()
-            }catch (e: SecurityException){
-
+            } catch (e: SecurityException) {
             }
         }
         intentFilters()
@@ -70,8 +67,11 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
 
     private fun initRcViews() = with(binding) {
         rcViewPaired.layoutManager = LinearLayoutManager(requireContext())
+        rcViewSearch.layoutManager = LinearLayoutManager(requireContext())
         itemAdapter = ItemAdapter(this@DeviceListFragment)
+        discoveryAdapter = ItemAdapter(this@DeviceListFragment)
         rcViewPaired.adapter = itemAdapter
+        rcViewSearch.adapter = discoveryAdapter
     }
 
     private fun getPairedDevices() {
@@ -81,9 +81,8 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
             deviceList.forEach {
                 list.add(
                     ListItem(
-                        it.name,
-                        it.address,
-                        preference?.getString(BluetoothConstants.MAC, "") == it.address
+                        it,
+                        preferences?.getString(BluetoothConstants.MAC, "") == it.address
                     )
                 )
             }
@@ -128,14 +127,6 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
         }
     }
 
-    fun registerPermissionListener() {
-        pLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ){
-
-        }
-    }
-
     private fun launchBtPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             pLauncher.launch(
@@ -144,39 +135,56 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             )
-        }else{
-            pLauncher.launch((arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )))
+        } else {
+            pLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            )
+        }
+    }
+
+    private fun registerPermissionListener() {
+        pLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+
         }
     }
 
     private fun saveMac(mac: String) {
-        val editer = preference?.edit()
-        editer?.putString(BluetoothConstants.MAC, mac)
-        editer?.apply()
+        val editor = preferences?.edit()
+        editor?.putString(BluetoothConstants.MAC, mac)
+        editor?.apply()
     }
 
-    override fun onClick(device: ListItem) {
-        saveMac(device.mac)
+    override fun onClick(item: ListItem) {
+        saveMac(item.device.address)
     }
-    private val bReceiver = object : BroadcastReceiver(){
+
+    private val bReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
-            if(intent?.action == BluetoothDevice.ACTION_FOUND){
-                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                try{
+            if (intent?.action == BluetoothDevice.ACTION_FOUND) {
+                val device =
+                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                val list = mutableSetOf<ListItem>()
+                list.addAll(discoveryAdapter.currentList)
+                if (device != null) list.add(ListItem(device, false))
+                discoveryAdapter.submitList(list.toList())
+                try {
                     Log.d("MyLog", "Device: ${device?.name}")
-                } catch (e: SecurityException){
+                } catch (e: SecurityException) {
 
                 }
-            } else if(intent?.action == BluetoothDevice.ACTION_BOND_STATE_CHANGED){
+            } else if (intent?.action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
 
-            } else if(intent?.action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED){
+            } else if (intent?.action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED) {
 
             }
         }
     }
-    private fun intentFilters(){
+
+    private fun intentFilters() {
         val f1 = IntentFilter(BluetoothDevice.ACTION_FOUND)
         val f2 = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         val f3 = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)

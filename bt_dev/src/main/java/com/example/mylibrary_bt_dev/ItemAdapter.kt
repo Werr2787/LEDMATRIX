@@ -1,6 +1,4 @@
 package com.example.bt_def
-
-import android.view.InputDevice
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mylibrary_bt_dev.ListItem
 import com.example.mylibrary_bt_dev.R
 import com.example.mylibrary_bt_dev.databinding.ListItemBinding
-
 
 class ItemAdapter(private val listener: Listener) :
     ListAdapter<ListItem, ItemAdapter.MyHolder>(Comparator()) {
@@ -37,8 +34,11 @@ class ItemAdapter(private val listener: Listener) :
 
         fun bind(item: ListItem) = with(b) {
             device = item
-            name.text = item.name
-            mac.text = item.mac
+            try {
+                name.text = item.device.name
+                mac.text = item.device.address
+            } catch (e: SecurityException){}
+
             if (item.isChecked) adapter.selectCheckBox(checkBox)
         }
     }
@@ -67,7 +67,6 @@ class ItemAdapter(private val listener: Listener) :
         oldCheckBox?.isChecked = false
         oldCheckBox = checkBox
         oldCheckBox?.isChecked = true
-
     }
 
     interface Listener {
