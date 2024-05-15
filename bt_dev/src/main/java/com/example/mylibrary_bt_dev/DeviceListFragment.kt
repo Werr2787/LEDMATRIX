@@ -4,9 +4,9 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.view.InputDevice
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,11 +16,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bt_def.ItemAdapter
 import com.example.bt_def.changeButtonColor
+import com.example.mylibrary_bt_dev.BluetoothConstants
 import com.example.mylibrary_bt_dev.ListItem
 import com.example.mylibrary_bt_dev.databinding.FragmentListBinding
 import com.google.android.material.snackbar.Snackbar
 
-class DeviceListFragment : Fragment(),ItemAdapter.Listener {
+class DeviceListFragment : Fragment(), ItemAdapter.Listener {
+    private var preference: SharedPreferences? = null
     private lateinit var itemAdapter: ItemAdapter
     private var bAdapter: BluetoothAdapter? = null
     private lateinit var binding: FragmentListBinding
@@ -36,6 +38,7 @@ class DeviceListFragment : Fragment(),ItemAdapter.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        preference = activity?.getSharedPreferences(BluetoothConstants.PREFERENCES, Context.MODE_PRIVATE)
         binding.imBluetoothOn.setOnClickListener {
             btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
@@ -45,50 +48,50 @@ class DeviceListFragment : Fragment(),ItemAdapter.Listener {
         bluetoothState()
     }
 
-    private fun initRcViews() = with(binding){
+    private fun initRcViews() = with(binding) {
         rcViewPaired.layoutManager = LinearLayoutManager(requireContext())
         itemAdapter = ItemAdapter(this@DeviceListFragment)
         rcViewPaired.adapter = itemAdapter
     }
 
-    private fun getPairedDevices(){
+    private fun getPairedDevices() {
         try {
             val list = ArrayList<ListItem>()
             val deviceList = bAdapter?.bondedDevices as Set<BluetoothDevice>
-            deviceList.forEach{
+            deviceList.forEach {
                 list.add(
                     ListItem(
                         it.name,
                         it.address,
-                        false
+                        preference?.getString(BluetoothConstants.MAC,"")==it.address
                     )
                 )
             }
-            binding.tvEmptyPaired.visibility = if(list.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvEmptyPaired.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
             itemAdapter.submitList(list)
-        } catch (e: SecurityException){
+        } catch (e: SecurityException) {
 
         }
 
     }
 
-    private fun initBtAdapter(){
+    private fun initBtAdapter() {
         val bManager = activity?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bAdapter = bManager.adapter
     }
 
-    private fun bluetoothState(){
-        if (bAdapter?.isEnabled == true){
+    private fun bluetoothState() {
+        if (bAdapter?.isEnabled == true) {
             changeButtonColor(binding.imBluetoothOn, Color.GREEN)
             getPairedDevices()
         }
     }
 
-    private fun registerBtLauncher(){
+    private fun registerBtLauncher() {
         btLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ){
-            if (it.resultCode == Activity.RESULT_OK){
+        ) {
+            if (it.resultCode == Activity.RESULT_OK) {
                 changeButtonColor(binding.imBluetoothOn, Color.GREEN)
                 getPairedDevices()
                 Snackbar.make(binding.root, "Блютуз включен!", Snackbar.LENGTH_LONG).show()
@@ -98,8 +101,14 @@ class DeviceListFragment : Fragment(),ItemAdapter.Listener {
         }
     }
 
-    override fun onClick(device: ListItem) {
+    private fun saveMac(mac: String) {
+        val editer = preference?.edit()
+        editer?.putString(BluetoothConstants.MAC,mac)
+        editer?.apply()
+    }
 
+    override fun onClick(device: ListItem) {
+        saveMac(device.mac)
     }
 
 }

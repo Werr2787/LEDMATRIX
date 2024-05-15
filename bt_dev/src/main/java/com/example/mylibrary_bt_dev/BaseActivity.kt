@@ -18,25 +18,25 @@ class BaseActivity : AppCompatActivity() {
 
     }
 
-    private fun initRcView() {
-        val rcView = findViewById<RecyclerView>(R.id.rcViewPaired)
-        rcView.layoutManager = LinearLayoutManager(this)
-        val adapter = ItemAdapter()
-        rcView.adapter = adapter
-        adapter.submitList(creatDeviceList())
-    }
-
-    private fun creatDeviceList(): List<ListItem> {
-        val list = ArrayList<ListItem>()
-
-        for (i in 0 until 5) {
-            list.add(
-                ListItem(
-                    "Device $i",
-                    "34:56:89:56"
-                )
-            )
-        }
-        return list
-    }
+//    private fun initRcView() {
+//        val rcView = findViewById<RecyclerView>(R.id.rcViewPaired)
+//        rcView.layoutManager = LinearLayoutManager(this)
+//        val adapter = ItemAdapter()
+//        rcView.adapter = adapter
+//        adapter.submitList(creatDeviceList())
+//    }
+//
+//    private fun creatDeviceList(): List<ListItem> {
+//        val list = ArrayList<ListItem>()
+//
+//        for (i in 0 until 5) {
+//            list.add(
+//                ListItem(
+//                    "Device $i",
+//                    "34:56:89:56"
+//                )
+//            )
+//        }
+//        return list
+//    }
 }
