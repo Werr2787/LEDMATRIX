@@ -68,8 +68,8 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
     private fun initRcViews() = with(binding) {
         rcViewPaired.layoutManager = LinearLayoutManager(requireContext())
         rcViewSearch.layoutManager = LinearLayoutManager(requireContext())
-        itemAdapter = ItemAdapter(this@DeviceListFragment)
-        discoveryAdapter = ItemAdapter(this@DeviceListFragment)
+        itemAdapter = ItemAdapter(this@DeviceListFragment, false)
+        discoveryAdapter = ItemAdapter(this@DeviceListFragment, true)
         rcViewPaired.adapter = itemAdapter
         rcViewSearch.adapter = discoveryAdapter
     }
@@ -171,13 +171,14 @@ class DeviceListFragment : Fragment(), ItemAdapter.Listener {
                 list.addAll(discoveryAdapter.currentList)
                 if (device != null) list.add(ListItem(device, false))
                 discoveryAdapter.submitList(list.toList())
+                binding.tvEmptySearch.visibility == if (list.isEmpty()) View.VISIBLE else View.GONE
                 try {
                     Log.d("MyLog", "Device: ${device?.name}")
                 } catch (e: SecurityException) {
 
                 }
             } else if (intent?.action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
-
+                getPairedDevices()
             } else if (intent?.action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED) {
 
             }
