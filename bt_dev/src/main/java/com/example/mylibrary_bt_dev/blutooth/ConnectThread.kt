@@ -2,6 +2,7 @@ package com.example.mylibrary_bt_dev.blutooth
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.util.Log
 import java.io.IOException
 import java.util.UUID
 
@@ -19,9 +20,12 @@ class ConnectThread(private val device: BluetoothDevice):Thread() {
     }
     override fun run() {
         try {
+            Log.d("Tg","Connecting...")
             mSocket?.connect()
-        }catch (e:IOException){
+            Log.d("Tg","Connected")
 
+        }catch (e:IOException){
+            Log.d("Tg","Not Connected")
         }catch (se: SecurityException){
 
         }
