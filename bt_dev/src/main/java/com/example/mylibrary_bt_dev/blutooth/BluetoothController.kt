@@ -1,24 +1,30 @@
 package com.example.mylibrary_bt_dev.blutooth
 
-import android.app.Notification.MessagingStyle.Message
+
 import android.bluetooth.BluetoothAdapter
 
 class BluetoothController(private val adapter: BluetoothAdapter) {
-    private var connectThread: ConnectThread?=null
-    fun contect(mac: String, listener: Listener){
+    private var connectThread: ConnectThread? = null
+
+    fun connect(mac: String, listener: Listener){
         if(adapter.isEnabled && mac.isNotEmpty()){
-            val divice=adapter.getRemoteDevice(mac)
-            connectThread= ConnectThread(divice,listener)
+            val device = adapter.getRemoteDevice(mac)
+            connectThread = ConnectThread(device, listener)
             connectThread?.start()
         }
     }
-    companion object{
-        const val BLUETOOTH_CONNECTED="bluetooth_connected"
-        const val BLUETOOTH_NO_CONNECTED="bluetooth_no_connected"
+    fun sendMessage(message: String){
+        connectThread?.sendMessage(message)
+    }
 
+    fun closeConnection(){
+        connectThread?.closeConnection()
+    }
+    companion object{
+        const val BLUETOOTH_CONNECTED = "bluetooth_connected"
+        const val BLUETOOTH_NO_CONNECTED = "bluetooth_no_connected"
     }
     interface Listener{
         fun onReceive(message: String)
     }
-
 }
