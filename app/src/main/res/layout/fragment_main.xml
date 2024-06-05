@@ -32,6 +32,7 @@
         android:id="@+id/bConnect"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/green"
         android:text="Connect"
         app:layout_constraintBottom_toTopOf="@+id/bList"
         app:layout_constraintEnd_toEndOf="parent"

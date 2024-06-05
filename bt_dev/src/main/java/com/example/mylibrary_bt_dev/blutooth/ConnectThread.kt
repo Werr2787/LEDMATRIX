@@ -6,34 +6,40 @@ import android.util.Log
 import java.io.IOException
 import java.util.UUID
 
-class ConnectThread(private val device: BluetoothDevice):Thread() {
-    private val uuid="00001101-0000-1000-8000-00805F9B34FB"
-    private var mSocket:BluetoothSocket?=null
+class ConnectThread(
+    private val device: BluetoothDevice,
+    val listener: BluetoothController.Listener
+) : Thread() {
+    private val uuid = "00001101-0000-1000-8000-00805F9B34FB"
+    private var mSocket: BluetoothSocket? = null
+
     init {
         try {
-            mSocket=device.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
-        }catch (e:IOException){
+            mSocket = device.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
+        } catch (e: IOException) {
 
-        }catch (se: SecurityException){
+        } catch (se: SecurityException) {
 
         }
     }
+
     override fun run() {
         try {
-            Log.d("Tg","Connecting...")
             mSocket?.connect()
-            Log.d("Tg","Connected")
+            listener.onReceive(BluetoothController.BLUETOOTH_CONNECTED)
+            Log.d("Tg", "Connected")
 
-        }catch (e:IOException){
-            Log.d("Tg","Not Connected")
-        }catch (se: SecurityException){
+        } catch (e: IOException) {
+            listener.onReceive(BluetoothController.BLUETOOTH_CONNECTED)
+        } catch (se: SecurityException) {
 
         }
     }
-    fun closeConnection(){
+
+    fun closeConnection() {
         try {
             mSocket?.close()
-        }catch (e:IOException){
+        } catch (e: IOException) {
 
         }
     }

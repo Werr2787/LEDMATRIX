@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.navigation.fragment.findNavController
 import com.example.ledmatrix.databinding.FragmentMainBinding
 import com.example.mylibrary_bt_dev.BluetoothConstants
 import com.example.mylibrary_bt_dev.blutooth.BluetoothController
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment(),BluetoothController.Listener {
     private lateinit var btAdapter:BluetoothAdapter
     private lateinit var binding:FragmentMainBinding
     private lateinit var bluetoothController:BluetoothController
@@ -38,13 +39,33 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_deviceListFragment)
         }
         binding.bConnect.setOnClickListener{
-            bluetoothController.contect(mac ?:"")
+            bluetoothController.contect(mac ?:"",this)
         }
     }
 
     private fun initBtAdapter() {
         val bManager = activity?.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         btAdapter = bManager.adapter
+    }
+
+    override fun onReceive(message: String) {
+        activity?.runOnUiThread{
+            when(message){
+                BluetoothController.BLUETOOTH_CONNECTED->{
+                    binding.bConnect.backgroundTintList=AppCompatResources
+                        .getColorStateList(requireContext(), com.example.mylibrary_bt_dev.R.color.red)
+                    binding.bConnect.text="Disconnect"
+                }
+                BluetoothController.BLUETOOTH_NO_CONNECTED->{
+                    binding.bConnect.backgroundTintList=AppCompatResources
+                        .getColorStateList(requireContext(), com.example.mylibrary_bt_dev.R.color.green)
+                    binding.bConnect.text="Connect"
+                }
+                else->{
+
+                }
+            }
+        }
     }
 
 
