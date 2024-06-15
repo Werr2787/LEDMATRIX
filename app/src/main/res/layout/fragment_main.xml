@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="#F5898989"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/imageSnow"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="60dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/snow" />
+
+    <ImageButton
+        android:id="@+id/imageBalls"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="188dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/balls" />
+
+    <ImageButton
+        android:id="@+id/imageBall"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="316dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ball" />
+
+    <ImageButton
+        android:id="@+id/imageBlesk"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="440dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/blesk" />
+
+    <ImageButton
+        android:id="@+id/imageMatrix"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="436dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/matrix" />
+
+    <ImageButton
+        android:id="@+id/imageStreet"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="316dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/sters" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="188dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/as" />
+
+    <ImageButton
+        android:id="@+id/imageDellet"
+        android:layout_width="127dp"
+        android:layout_height="111dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="60dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/baseline_delete_24" />
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/connect"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#BCB08E"
+        android:text="Connect"
+        app:layout_constraintBottom_toTopOf="@+id/btList"
+        app:layout_constraintEnd_toEndOf="@+id/btList"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btList" />
+
+    <Button
+        android:id="@+id/btList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#404040"
+        android:text="Device list"
+        android:textColorLink="#8E8484"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
